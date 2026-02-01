@@ -8,7 +8,10 @@ cache/
 logs/
 final/
 *.pdf
-*.js
+# Keep file_template.js but exclude other .js files
+tinyemu/*.js
+tinyemu/js/*.js
+*.min.js
 
 # Git artifacts
 .git/
@@ -86,6 +89,12 @@ tinyemu/*.js.o
 tinyemu/*.d
 tinyemu/js/*.wasm
 tinyemu/js/riscvemu*.js
+tinyemu/js/*.wasm.js
+tinyemu/js/riscvemu32.js
+tinyemu/js/riscvemu64.js
+tinyemu/js/riscvemu*-wasm.js
+# Keep lib.js but exclude other generated JS files
+!tinyemu/js/lib.js
 
 # Test files and benchmarks
 test/
