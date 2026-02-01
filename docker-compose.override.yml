@@ -1,0 +1,19 @@
+# Docker Compose override for development
+# This file automatically extends docker-compose.yml when present
+# Provides development-friendly defaults and optimizations
+
+services:
+  # Override 32-bit builder for development
+  builder-32:
+    environment:
+      - BITS=32
+      - USE_CACHE=true                   # Enable cache in development
+      - BUILD_CLEAN=false                 # Don't force clean rebuild
+      - DEBUG=true                        # Enable debug output
+    volumes:
+      - ./out:/app/out
+      - ./cache:/app/cache                # Persistent cache enabled
+      - ./logs:/app/logs
+      - .:/app/src                        # Mount source code for live updates
+    entrypoint: ["./scripts/entrypoint.sh", "./scripts/docker-build.sh"]
+

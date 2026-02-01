@@ -1,0 +1,42 @@
+# Override for 64-bit LinuxPDF builds
+# This file extends docker-compose.yml to provide 64-bit build services
+
+services:
+  # 64-bit LinuxPDF builder
+  builder-64:
+    extends: builder-32
+    environment:
+      - BITS=64                           # Build 64-bit version
+      - USE_CACHE=false                   # Cache disabled by default
+      - BUILD_CLEAN=false                 # Don't force clean rebuild
+    entrypoint: ["./scripts/entrypoint.sh", "./scripts/docker-build.sh"]
+
+  # PDF extractor for 64-bit build
+  pdf-64:
+    build:
+      context: .
+      target: pdf-output
+    volumes:
+      - ./final:/output                    # Final PDF output
+    depends_on:
+      - builder-64
+    profiles: ["extract"]                  # Only run when explicitly requested
+    networks:
+      - buildnet
+
+  # Full output extractor for development (64-bit)
+  output-64:
+    build:
+      context: .
+      target: full-output
+    volumes:
+      - ./final:/output                    # Full build output
+    depends_on:
+      - builder-64
+    profiles: ["dev-output"]               # Only run when explicitly requested
+    networks:
+      - buildnet
+
+networks:
+  buildnet:
+    driver: bridge

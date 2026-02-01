@@ -1,0 +1,48 @@
+services:
+  # 32-bit LinuxPDF builder
+  builder-32:
+    build:
+      context: .
+      target: builder
+    volumes:
+      - ./out:/app/out                    # Build output directory
+      - ./cache:/app/cache                # Download cache (empty by default)
+      - ./logs:/app/logs                   # Build logs
+    environment:
+      - BITS=32                           # Build 32-bit version
+      - USE_CACHE=false                   # Cache disabled by default
+      - BUILD_CLEAN=false                 # Don't force clean rebuild
+    working_dir: /app
+    entrypoint: ["./scripts/entrypoint.sh", "./scripts/docker-build.sh"]
+    networks:
+      - buildnet
+
+  # PDF extractor for 32-bit build
+  pdf-32:
+    build:
+      context: .
+      target: pdf-output
+    volumes:
+      - ./final:/output                    # Final PDF output
+    depends_on:
+      - builder-32
+    profiles: ["extract"]                  # Only run when explicitly requested
+    networks:
+      - buildnet
+
+  # Full output extractor for development (32-bit)
+  output-32:
+    build:
+      context: .
+      target: full-output
+    volumes:
+      - ./final:/output                    # Full build output
+    depends_on:
+      - builder-32
+    profiles: ["dev-output"]               # Only run when explicitly requested
+    networks:
+      - buildnet
+
+networks:
+  buildnet:
+    driver: bridge
