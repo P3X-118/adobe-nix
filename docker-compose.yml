@@ -14,7 +14,7 @@ services:
       - BUILD_CLEAN=false                 # Don't force clean rebuild
     working_dir: /app
     entrypoint: ["./scripts/entrypoint.sh", "./scripts/docker-build.sh"]
-    network_mode: "host"
+    # network_mode: "host"
 
   # PDF extractor for 32-bit build
   pdf-32:

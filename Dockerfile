@@ -45,16 +45,20 @@ RUN mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build && \
 USER builder
 WORKDIR /tmp/app
 
-# Run build inline - simplified version
+# Switch to builder user for actual build
+USER builder
+WORKDIR /tmp/app
+
+# Run build as builder user - this should fix permissions
 RUN . /app/.venv/bin/activate && \
     echo "Starting LinuxPDF Docker build (BITS=32, USE_CACHE=false)" && \
-    mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build /tmp/app/out && \
+    mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build && \
     if [ ! -f "/tmp/app/build/vm.tar.gz" ]; then \
         wget "https://bellard.org/tinyemu/diskimage-linux-riscv-2018-09-23.tar.gz" -O /tmp/app/build/vm.tar.gz; \
     fi && \
     if [ ! -d "/tmp/app/build/vm" ]; then \
         tar -xf /tmp/app/build/vm.tar.gz -C /tmp/app/build && \
-        mv /tmp/app/build/diskimage* /tmp/app/build/vm; \
+        mv "/tmp/app/build/diskimage"* "/tmp/app/build/vm"; \
     fi && \
     echo "Building TinyEMU..." && \
     emmake make -C /tmp/app/tinyemu/ -f Makefile.pdfjs -j$(nproc --all) && \
