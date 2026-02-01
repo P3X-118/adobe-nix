@@ -52,7 +52,7 @@ WORKDIR /tmp/app
 # Run build as builder user - this should fix permissions
 RUN . /app/.venv/bin/activate && \
     echo "Starting LinuxPDF Docker build (BITS=32, USE_CACHE=false)" && \
-    mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build && \
+    mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build /tmp/app/out && \
     if [ ! -f "/tmp/app/build/vm.tar.gz" ]; then \
         wget "https://bellard.org/tinyemu/diskimage-linux-riscv-2018-09-23.tar.gz" -O /tmp/app/build/vm.tar.gz; \
     fi && \
