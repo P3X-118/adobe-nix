@@ -44,10 +44,19 @@ main() {
     # Switch to builder user and execute command
     if [ "$(id -u)" = "0" ]; then
         log "INFO" "Switching to builder user and executing: $*"
-        exec su builder -c "cd /app && $*"
+        # Check if the command is our Docker build script which needs /tmp/app
+        if [[ "$*" == *"/app/scripts/docker-build.sh"* ]]; then
+            exec su builder -c "cd /tmp/app && $*"
+        else
+            exec su builder -c "cd /app && $*"
+        fi
     else
         log "INFO" "Executing as current user: $*"
-        cd /app
+        if [[ "$*" == *"/app/scripts/docker-build.sh"* ]]; then
+            cd /tmp/app
+        else
+            cd /app
+        fi
         exec "$@"
     fi
 }

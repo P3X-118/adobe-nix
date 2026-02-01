@@ -41,7 +41,7 @@ USER builder
 WORKDIR /tmp/app
 
 # Run build inline - simplified version
-RUN source .venv/bin/activate && \
+RUN . /app/.venv/bin/activate && \
     echo "Starting LinuxPDF Docker build (BITS=32, USE_CACHE=false)" && \
     mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build /tmp/app/out && \
     if [ ! -f "/tmp/app/build/vm.tar.gz" ]; then \
@@ -52,10 +52,10 @@ RUN source .venv/bin/activate && \
         mv /tmp/app/build/diskimage* /tmp/app/build/vm; \
     fi && \
     echo "Building TinyEMU..." && \
-    emmake make -C tinyemu/ -f Makefile.pdfjs -j$(nproc --all) && \
+    emmake make -C /app/tinyemu/ -f Makefile.pdfjs -j$(nproc --all) && \
     echo "Embedding files..." && \
-    python3 embed_files.py file_template.js tinyemu/files/ files.js && \
-    cat build/pako.min.js files.js pdflinux.js tinyemu/js/riscvemu32.js > out/linux.pdf && \
+    python3 /app/embed_files.py file_template.js /tmp/app/tinyemu/files/ files.js && \
+    cat /tmp/app/build/pako.min.js files.js /app/pdflinux.js /app/tinyemu/js/riscvemu32.js > out/linux.pdf && \
     echo "Build completed!"
 
 # Stage 3: PDF-only Output

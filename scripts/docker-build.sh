@@ -94,11 +94,11 @@ fi
     # Build TinyEMU
     if [ "$BUILD_CLEAN" = "true" ]; then
         log "INFO" "Cleaning TinyEMU build"
-        emmake make -C tinyemu/ -f Makefile.pdfjs clean
+        emmake make -C /app/tinyemu/ -f Makefile.pdfjs clean
     fi
     
     log "INFO" "Building TinyEMU for JavaScript"
-    emmake make -C tinyemu/ -f Makefile.pdfjs -j$(nproc --all)
+    emmake make -C /app/tinyemu/ -f Makefile.pdfjs -j$(nproc --all)
     
     # Download pako.min.js if needed
     if [ ! -f "$BUILD_DIR/pako.min.js" ]; then
@@ -109,7 +109,7 @@ fi
     # Build file utilities if needed
     if [ ! -f "$BUILD_DIR/build_files" ]; then
         log "INFO" "Building file utilities"
-        gcc tinyemu/build_filelist.c tinyemu/fs_utils.c tinyemu/cutils.c -o "$BUILD_DIR/build_files"
+        gcc /app/tinyemu/build_filelist.c /app/tinyemu/fs_utils.c /app/tinyemu/cutils.c -o "$BUILD_DIR/build_files"
     fi
     
     # Alpine Linux setup for 64-bit
@@ -182,10 +182,22 @@ EOF
     get_img_rootfs() {
         log "INFO" "Setting up 32-bit root filesystem"
         mkdir -p "$BUILD_DIR/mountpoint"
-        mount -o ro "$BUILD_DIR/vm/root-riscv$BITS.bin" "$BUILD_DIR/mountpoint"
+        
+        # Check if the root filesystem image exists
+        if [ ! -f "$BUILD_DIR/vm/root-riscv$BITS.bin" ]; then
+            log "ERROR" "Root filesystem image not found: $BUILD_DIR/vm/root-riscv$BITS.bin"
+            exit 1
+        fi
+        
+        # Try to mount with sudo (container should allow this)
+        if ! sudo mount -o ro "$BUILD_DIR/vm/root-riscv$BITS.bin" "$BUILD_DIR/mountpoint"; then
+            log "ERROR" "Failed to mount root filesystem image"
+            exit 1
+        fi
+        
         cp -ar "$BUILD_DIR/mountpoint" "$BUILD_DIR/root"
         cp -ar /app/init "$BUILD_DIR/root/sbin/init"
-        umount "$BUILD_DIR/mountpoint"
+        sudo umount "$BUILD_DIR/mountpoint"
         rm -rf "$BUILD_DIR/mountpoint"
     }
     
@@ -238,7 +250,7 @@ EOF
     # Embed files and create JavaScript bundle
     log "INFO" "Embedding files into JavaScript"
     python3 /app/embed_files.py file_template.js "$BUILD_DIR/files/" "$BUILD_DIR/files.js"
-    cat "$BUILD_DIR/pako.min.js" "$BUILD_DIR/files.js" /app/pdflinux.js "tinyemu/js/riscvemu$BITS.js" > /app/out/compiled.js
+    cat "$BUILD_DIR/pako.min.js" "$BUILD_DIR/files.js" /app/pdflinux.js "/app/tinyemu/js/riscvemu$BITS.js" > /app/out/compiled.js
     
     # Generate final PDF
     log "INFO" "Generating final PDF"
