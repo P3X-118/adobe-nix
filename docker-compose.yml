@@ -5,9 +5,9 @@ services:
       context: .
       target: builder
     volumes:
-      - ./out:/app/out                    # Build output directory
-      - ./cache:/app/cache                # Download cache (empty by default)
-      - ./logs:/app/logs                   # Build logs
+      - ./out:/tmp/app/out               # Build output directory
+      - ./cache:/tmp/app/cache            # Download cache (empty by default)
+      - ./logs:/tmp/app/logs             # Build logs
     environment:
       - BITS=32                           # Build 32-bit version
       - USE_CACHE=false                   # Cache disabled by default

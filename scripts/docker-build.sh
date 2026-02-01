@@ -250,7 +250,7 @@ EOF
     # Embed files and create JavaScript bundle
     log "INFO" "Embedding files into JavaScript"
     python3 /app/embed_files.py file_template.js "$BUILD_DIR/files/" "$BUILD_DIR/files.js"
-    cat "$BUILD_DIR/pako.min.js" "$BUILD_DIR/files.js" /app/pdflinux.js "/tmp/app/tinyemu/js/riscvemu$BITS.js" > /app/out/compiled.js
+    cat "$BUILD_DIR/pako.min.js" "$BUILD_DIR/files.js" /app/pdflinux.js "/tmp/app/tinyemu/js/riscvemu$BITS.js" > /tmp/app/out/compiled.js
     
     # Generate final PDF
     log "INFO" "Generating final PDF"

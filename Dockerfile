@@ -33,7 +33,7 @@ FROM build-env AS builder
 COPY . .
 
 # Ensure directories exist in /tmp and copy tinyemu to writable location
-RUN mkdir -p /tmp/app/out /tmp/app/cache /tmp/app/logs /tmp/app/build && \
+RUN mkdir -p /tmp/app/cache /tmp/app/logs /tmp/app/build && \
     chown -R builder:builder /tmp/app && \
     cp -r /app/tinyemu /tmp/app/tinyemu && \
     cp /app/file_template.js /tmp/app/ && \
